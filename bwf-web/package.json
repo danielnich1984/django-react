@@ -2,7 +2,13 @@
   "name": "bwf-web",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8000",
   "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.15.3",
+    "@mui/material": "^5.15.3",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -13,6 +19,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "dev": "webpack serve --config webpack.config.js --open",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -34,5 +41,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-dev-server": "^4.15.1"
   }
 }
