@@ -1,20 +1,21 @@
 import React, {useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
+import { getGroups } from '../services/group-services';
 
 function GroupList() {
 
-const [ groups, setGroup ] = useState(null);
+const [ groups, setGroups ] = useState(null);
 const [ loading, setLoading ] = useState(false);
 const [ error, setError ] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     const getData = async () => {
-      await fetch('http://127.0.0.1:8000/api/groups/')
-      .then( resp => resp.json())
-      .then( data=> {
-        setGroup(data);
+      await getGroups ()
+      .then( data => {
+        setGroups(data);
         setLoading(false);
-      }).catch(e => {
+      }).catch( e => {
         setError(true);
         setLoading(false);
       })
@@ -28,7 +29,9 @@ const [ error, setError ] = useState(null);
   return (
     <div>
         { groups && groups.map(group => {
-          return <p key={group.id}>{group.name}: {group.location}</p>
+          return <Link key={group.id} to={`/details/${group.id}`}>
+              <p>{group.name}: {group.location}</p>
+            </Link>
         })}
     </div>
   )
