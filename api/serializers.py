@@ -1,5 +1,6 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Group, Event
+from .models import Group, Event, UserProfile
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta: 
@@ -16,3 +17,14 @@ class GroupFullSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Group
         fields = ('id', 'name', 'location', 'description', 'events')
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'user', 'image')
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'profile')

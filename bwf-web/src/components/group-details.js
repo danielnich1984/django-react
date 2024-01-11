@@ -4,19 +4,9 @@ import { useFetchGroup } from '../hooks/fetch-group';
 import { DateTime } from 'luxon';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AlarmIcon from '@mui/icons-material/Alarm';
-// import { makeStyles } from '@mui/styles';
 
 
 function GroupDetails() {
-
-  // const useStyles = makeStyles( theme => ({
-  //   dateTime: {
-  //     fontSize: '18px',
-  //     marginRight: '3px', 
-  //     marginTop: '10px',
-  //     color: theme.colors.mainAccentColor
-  //   }
-  // }))
 
   const { id } = useParams();
   const [data, loading, error ] = useFetchGroup(id);
@@ -46,8 +36,8 @@ function GroupDetails() {
                   return <div key={event.id}>
                       <p>{event.team1} VS {event.team2}</p>
                       <p>
-                          <CalendarTodayIcon />{ evtTime.toSQLDate() } 
-                          <AlarmIcon />{ evtTime.toFormat('HH:mm') }
+                          <CalendarTodayIcon color="primary" />{ evtTime.toSQLDate() } 
+                          <AlarmIcon color="primary" />{ evtTime.toFormat('HH:mm') }
                       </p>
                   </div>
                 })}
