@@ -14,6 +14,7 @@ function Sidebar() {
   const handleSubmit = async e => {
     e.preventDefault()
     const Data = await auth({username, password})
+    
     // setAuthData(Data);
   }
 
