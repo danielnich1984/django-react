@@ -15,7 +15,7 @@ import '@fontsource/roboto/700.css';
 
 function App() {
 
-  const user = "MYUser";
+  const user = JSON.parse(localStorage.getItem('bwf-user'));
 
   return (
     <ThemeProvider theme={theme}>

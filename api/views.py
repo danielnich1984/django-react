@@ -8,10 +8,13 @@ from .models import Group, Event, UserProfile
 from .serializers import GroupSerializer, GroupFullSerializer, EventSerializer, UserSerializer, UserProfileSerializer
 
 # Create your views here.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 class UserProfileViewset(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-
 
 class GroupViewset(viewsets.ModelViewSet):
     queryset = Group.objects.all()

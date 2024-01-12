@@ -21,10 +21,11 @@ class GroupFullSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ('id', 'user', 'image')
+        fields = ('image',)
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer()
     class Meta:
         model = User
-        fields = ('id', 'username', 'profile')
+        fields = ('id', 'username', 'email', 'password', 'profile')
+        extra_kwargs = {'password': {'write_only': True, 'required': False}}
