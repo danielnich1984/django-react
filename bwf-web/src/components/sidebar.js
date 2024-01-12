@@ -3,20 +3,23 @@ import { Button, Box, TextField } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import VpnKey from '@mui/icons-material/VpnKey';
 import { auth } from '../services/user-services';
+import { useAuth } from '../hooks/useAuth';
 
 function Sidebar() {
 
   const [ username, setUsername ] = useState('')
   const [ password, setPassword ] = useState('')
+  const { authData, setAuthData } = useAuth();
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const authData = await auth({username, password})
-    console.log(authData);
+    const Data = await auth({username, password})
+    // setAuthData(Data);
   }
 
   return (
     <div className="sidebar">
+      { authData && <p>{authData}</p> }
       <form onSubmit={ handleSubmit }>
         <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
           <AccountCircle sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
