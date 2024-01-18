@@ -1,12 +1,14 @@
 import React from 'react';
 import './App.css';
-import Header from './components/header';
-import Sidebar from './components/sidebar';
-import Main from './components/main';
+import Header from './components/layout/header';
+import Sidebar from './components/layout/sidebar';
+import Main from './components/layout/main';
 import { ThemeProvider } from '@mui/material/styles'
 import theme from './theme';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
+import 'react-notifications/lib/notifications.css';
+import { NotificationContainer } from 'react-notifications';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -29,6 +31,7 @@ function App() {
             </div>
           </Router>
         </div>
+        <NotificationContainer />
       </AuthProvider>
     </ThemeProvider>
   )

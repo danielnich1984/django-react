@@ -1,4 +1,4 @@
-import { amber, lightBlue, purple } from '@mui/material/colors';
+import { amber, lightBlue } from '@mui/material/colors';
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme ({
@@ -11,7 +11,8 @@ const theme = createTheme ({
         bgColor: '#3e3e3d',
         bgLightColor: '#888',
         mainAccentColor: '#fecc01',
-    }
+    },
+
 });
 
 export default theme;
