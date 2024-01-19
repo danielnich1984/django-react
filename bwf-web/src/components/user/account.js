@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, Box, TextField } from '@mui/material';
 import { uploadAvatar } from '../../services/user-services';
 import { changePass } from '../../services/user-services';
@@ -11,7 +11,6 @@ export default function Account() {
 
   const { authData } = useAuth();
   const [ image, setImage ] = useState();
-  const navigate = useNavigate();
   const [ oldPassword, setOldPassword ] = useState('')
   const [ newPassword, setNewPassword ] = useState('')
   const [ password2, setPassword2 ] = useState('')
@@ -55,7 +54,7 @@ export default function Account() {
             <Button type="submit" variant="contained" color="primary">Upload File</Button>
         </form>
         <br/>
-/       <h1>Change Your Password</h1>
+       <h1>Change Your Password</h1>
         <form onSubmit={submitChangePass}>
 
         <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>

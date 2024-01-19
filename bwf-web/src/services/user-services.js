@@ -1,3 +1,5 @@
+import { status } from '../utils';
+
 export function auth(credentials){
     return fetch('http://127.0.0.1:8000/api/authenticate/', {
         method: 'POST', 
@@ -5,10 +7,7 @@ export function auth(credentials){
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials)
-    }).then(resp => resp.json())
-    .catch( e=> {
-        console.log(e);
-    })
+    }).then(status).catch( e=> { console.log(e) })
 }
 
 export function register(userData){
@@ -18,20 +17,14 @@ export function register(userData){
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData)
-    }).then(resp => resp.json())
-    .catch( e=> {
-        console.log(e);
-    })
+    }).then(status).catch( e=> { console.log(e) })
 }
 
 export function uploadAvatar(profileID, data){
     return fetch(`http://127.0.0.1:8000/api/profile/${profileID}/`, {
         method: 'PUT', 
         body: data
-    }).then(resp => resp.json())
-    .catch( e => {
-        console.log(e);
-    })
+    }).then(status).catch( e=> { console.log(e) })
 }
 
 export function changePass(userData, userID){
@@ -41,8 +34,5 @@ export function changePass(userData, userID){
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData)
-    }).then(resp => resp.json())
-    .catch( e => {
-        console.log(e);
-    })
+    }).then(status).catch( e=> { console.log(e) })
 }
