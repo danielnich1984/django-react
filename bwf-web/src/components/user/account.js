@@ -30,7 +30,10 @@ export default function Account() {
   const submitChangePass = async e => {
     e.preventDefault();
     if(passMatch()){
-      const passData = await changePass({ old_password: oldPassword, new_password: newPassword }, authData.user.id);
+      const passData = await changePass({ old_password: oldPassword, new_password: newPassword }, 
+        authData.user.id,
+        authData.token
+        );
       if(passData){
         NotificationManager.success("Password has been changed")
       }

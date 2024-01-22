@@ -8,11 +8,8 @@ import Account from '../user/account';
 
 function Main() {
 
-  const { authData } = useAuth();
-
   return (
     <div className="main">
-      {authData && <h3>{ authData.user.username }</h3>}
       <Routes>
         <Route exact path="/" element={<GroupList />}></ Route>
         <Route exact path="/details/:id" element={<GroupDetails />}></ Route>

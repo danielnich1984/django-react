@@ -1,13 +1,18 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from .models import Group, Event, UserProfile
+from .models import Group, Event, UserProfile, Member
 
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Event
         fields = ('id', 'team1', 'team2', 'time', 'score1', 'score2', 'group')
+
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Member
+        fields = ('user', 'group', 'admin')
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta: 
@@ -16,9 +21,25 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class GroupFullSerializer(serializers.ModelSerializer):
     events = EventSerializer(many=True)
+    members = serializers.SerializerMethodField()
+
     class Meta: 
         model = Group
-        fields = ('id', 'name', 'location', 'description', 'events')
+        fields = ('id', 'name', 'location', 'description', 'events', 'members')
+
+    def get_members(self, obj):
+        people_points = []
+        members = obj.members.all()
+
+        for member in members:
+            points = 0
+            members_serialized = MemberSerializer(member, many=False)
+            member_data = members_serialized.data
+            member_data['points'] = points
+
+            people_points.append(member_data)
+        
+        return people_points
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
