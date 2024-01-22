@@ -56,8 +56,48 @@ class EventViewset(viewsets.ModelViewSet):
 class MemberViewset(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
+
+    @action(methods=['POST'], detail=False)
+    def join(self, request):
+        if 'group' in request.data and 'user' in request.data:
+            try:
+                group = Group.objects.get(id=request.data['group'])
+                user = User.objects.get(id=request.data['user'])
+
+                member = Member.objects.create(group=group, user=user, admin=False)
+                serializer = MemberSerializer(member, many=False)
+                response = {'message': 'Joined Group', 'results': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+            except:
+                response = {'message': 'Cannot join'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                               
+        else:
+            response = {'message': 'Wrong Params'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(methods=['POST'], detail=False)
+    def leave(self, request):
+        if 'group' in request.data and 'user' in request.data:
+            try:
+                group = Group.objects.get(id=request.data['group'])
+                user = User.objects.get(id=request.data['user'])
+                member = Member.objects.get(group=group, user=user)
+                member.delete()
+                serializer = MemberSerializer(member, many=False)
+                response = {'message': 'Left Group', 'results': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+            except:
+                response = {'message': 'Cannot leave group'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                               
+        else:
+            response = {'message': 'Wrong Params'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        
 
 class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):

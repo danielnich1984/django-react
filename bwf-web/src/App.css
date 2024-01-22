@@ -22,7 +22,8 @@
 }
 
 .container{
-  justify-content: center;
+  width: '100px';
+  position: 'relative';
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,6 +32,11 @@
 .username {
   padding: 0;
   margin: 0;
+}
+
+.memberContainer {
+  display: grid;
+  grid-template-columns: '100px auto';
 }
 
 .main{

@@ -7,8 +7,8 @@ export default function User({user}) {
 
     return (
 
-        <div className="container">  
-            <Avatar alt="Avatar Image" src={"http://127.0.0.1:8000"+user.profile.image} sx={{ width: 150, height: 150 }} />
+        <div>
+            <Avatar alt="Avatar Image" src={"http://127.0.0.1:8000"+user.profile.image} sx={{ width: 75, height: 75 }} />
             <h4 className="username">{user.username}</h4>
         </div>
     )

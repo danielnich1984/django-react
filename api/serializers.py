@@ -3,6 +3,25 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from .models import Group, Event, UserProfile, Member
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ('id', 'image', 'is_premium', 'bio')
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password', 'profile')
+        extra_kwargs = {'password': {'write_only': True, 'required': False}}
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
+        user = User.objects.create_user(**validated_data)
+        UserProfile.objects.create(user=user, **profile_data)
+        Token.objects.create(user=user)
+        return user
+    
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta: 
@@ -10,6 +29,7 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ('id', 'team1', 'team2', 'time', 'score1', 'score2', 'group')
 
 class MemberSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False)
     class Meta: 
         model = Member
         fields = ('user', 'group', 'admin')
@@ -41,25 +61,6 @@ class GroupFullSerializer(serializers.ModelSerializer):
         
         return people_points
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ('id', 'image', 'is_premium', 'bio')
-
-class UserSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer()
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'password', 'profile')
-        extra_kwargs = {'password': {'write_only': True, 'required': False}}
-
-    def create(self, validated_data):
-        profile_data = validated_data.pop('profile')
-        user = User.objects.create_user(**validated_data)
-        UserProfile.objects.create(user=user, **profile_data)
-        Token.objects.create(user=user)
-        return user
-    
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)

@@ -57,7 +57,7 @@ function Sidebar() {
         <Link to ={'/register'}>Regiter here if you don't have an account yet.</Link>
       </div>
       : 
-        <div>
+        <div className="container">
           <User user={authData.user} name="something" />
           <br/>
           <br/>
