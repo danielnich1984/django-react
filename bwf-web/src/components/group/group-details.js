@@ -1,5 +1,5 @@
 import React, {useState, useEffect } from 'react';
-import { Button } from '@mui/material';
+import { Button, ListItem } from '@mui/material';
 import { useParams, Link } from 'react-router-dom';
 import { useFetchGroup } from '../../hooks/fetch-group';
 import User from '../user/user';
@@ -46,7 +46,7 @@ function GroupDetails() {
 
     return (
         <div>
-            <Link to={'/'}>Back</Link>
+            <Link to={'/'} key={group.id}>Back</Link>
             { group &&
               <React.Fragment>
                 <h1>{group.name} {group.location}</h1>
