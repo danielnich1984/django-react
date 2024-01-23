@@ -8,6 +8,7 @@ import AlarmIcon from '@mui/icons-material/Alarm';
 import User from '../user/user';
 import { joinGroup, leaveGroup } from '../../services/group-services';
 import { useAuth } from '../../hooks/useAuth';
+import Comments from '../comments/comments';
 
 function GroupDetails() {
 
@@ -16,6 +17,7 @@ function GroupDetails() {
   const [ data, loading, error ] = useFetchGroup(id);
   const [ group, setGroup ] = useState(null);
   const [ isGroup, setInGroup ] = useState(false);
+  const [ isAdmin, setIsAdmin ] = useState(false);
 
 
   useEffect(() => {
@@ -23,6 +25,7 @@ function GroupDetails() {
     if(data?.members){
       if(authData?.user){
         setInGroup(!!data.members.find( member => member.user.id === authData.user.id));
+        setIsAdmin(!!data.members.find( member => member.user.id === authData.user.id)?.admin);
       }
     }
     setGroup(data);
@@ -85,7 +88,7 @@ function GroupDetails() {
                   </div>
                 })}
 
-
+                <Comments group={group} />
               </React.Fragment>
             }
         </div>
