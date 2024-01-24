@@ -46,7 +46,7 @@ function GroupDetails() {
 
     return (
         <div>
-            <Link to={'/'} key={group.id}>Back</Link>
+            <Link to={'/'}>Back</Link>
             { group &&
               <React.Fragment>
                 <h1>{group.name} {group.location}</h1>

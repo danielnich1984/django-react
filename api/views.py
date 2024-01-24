@@ -5,8 +5,9 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from .models import Group, Event, UserProfile, Member, Comment
-from .serializers import GroupSerializer, GroupFullSerializer, EventSerializer, UserSerializer, UserProfileSerializer, ChangePasswordSerializer, MemberSerializer, CommentSerializer
+from datetime import datetime
+from .models import Group, Event, UserProfile, Member, Comment, Bet
+from .serializers import BetSerializer, GroupSerializer, GroupFullSerializer, EventSerializer, UserSerializer, UserProfileSerializer, ChangePasswordSerializer, MemberSerializer, CommentSerializer, EventFullSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 
@@ -57,6 +58,11 @@ class EventViewset(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = EventFullSerializer(instance, many=False, context={'request':request})
+        return Response(serializer.data)
+
 class MemberViewset(viewsets.ModelViewSet):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
@@ -101,7 +107,63 @@ class MemberViewset(viewsets.ModelViewSet):
             response = {'message': 'Wrong Params'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
+class BetViewset(viewsets.ModelViewSet):
+    queryset = Bet.objects.all()
+    serializer_class = BetSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = {"message": "Method not allowed"}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    def update(self, request, *args, **kwargs):
+        response = {"message": "Method not allowed"}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(detail=False, methods=['POST'], url_path='place_bet')
+    def place_bet(self, request):
+        if 'event' in request.data and 'score1' in request.data and 'score2' in request.data:
+            event_id = request.data['event']
+            event = Event.objects.get(id=event_id)
+
+            #Check if useer is in group
+            in_group = self.checkifUserInGroup(event, request.user)
+
+
+            if event.time > datetime.now() and in_group:
+
+                score1 = request.data['score1']
+                score2 = request.data['score2']
+
+                try:
+                    #Update Here
+                    my_bet = Bet.objects.get(event=event_id, user=request.user.id)
+                    my_bet.score1 = score1
+                    my_bet.score2 = score2
+                    my_bet.save()
+                    serializer = BetSerializer(my_bet, many=False)
+                    response = {"message": "Bet Updated", "new": False, "results": serializer.data}
+                    return Response(response, status=status.HTTP_200_OK)
+                except:
+                    #Create Here
+                    my_bet = Bet.objects.get(event=event, user=request.use, score1=score1, score2=score2)
+                    serializer = BetSerializer(my_bet, many=False)
+                    response = {"message": "Bet Created", "new": False, "results": serializer.data}
+                    return Response(response, status=status.HTTP_200_OK)
+
+            else:
+                response = {"message": "You can't place a bet. Too late!"}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                
+        else:
+            response = {"message": "Wrong Params"}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         
+    def checkifUserInGroup(self, event, user):
+        try:
+            return Member.objects.get(user=user, group=event.group)
+        except:
+            return False
+
 
 class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
