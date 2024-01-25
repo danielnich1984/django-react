@@ -110,6 +110,8 @@ class MemberViewset(viewsets.ModelViewSet):
 class BetViewset(viewsets.ModelViewSet):
     queryset = Bet.objects.all()
     serializer_class = BetSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         response = {"message": "Method not allowed"}
@@ -125,18 +127,19 @@ class BetViewset(viewsets.ModelViewSet):
             event_id = request.data['event']
             event = Event.objects.get(id=event_id)
 
-            #Check if useer is in group
+            #Check if user is in group
             in_group = self.checkifUserInGroup(event, request.user)
 
 
-            if event.time > datetime.now() and in_group:
+            # if event.time > datetime.now() and in_group:
+            if in_group:
 
                 score1 = request.data['score1']
                 score2 = request.data['score2']
 
                 try:
                     #Update Here
-                    my_bet = Bet.objects.get(event=event_id, user=request.user.id)
+                    my_bet = Bet.objects.get(events=event_id, user=request.user.id)
                     my_bet.score1 = score1
                     my_bet.score2 = score2
                     my_bet.save()
@@ -145,9 +148,9 @@ class BetViewset(viewsets.ModelViewSet):
                     return Response(response, status=status.HTTP_200_OK)
                 except:
                     #Create Here
-                    my_bet = Bet.objects.get(event=event, user=request.use, score1=score1, score2=score2)
+                    my_bet = Bet.objects.create(events=event, user=request.user, score1=score1, score2=score2)
                     serializer = BetSerializer(my_bet, many=False)
-                    response = {"message": "Bet Created", "new": False, "results": serializer.data}
+                    response = {"message": "Bet Created", "new": True, "results": serializer.data}
                     return Response(response, status=status.HTTP_200_OK)
 
             else:

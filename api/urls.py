@@ -10,6 +10,7 @@ router.register(r'members', views.MemberViewset)
 router.register(r'users', views.UserViewSet)
 router.register(r'profile', views.UserProfileViewset)
 router.register(r'comments', views.CommentViewset)
+router.register(r'bets', views.BetViewset)
                 
 urlpatterns = [
     path(r'', include(router.urls)),

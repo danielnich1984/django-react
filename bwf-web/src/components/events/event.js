@@ -7,12 +7,12 @@ import AlarmIcon from '@mui/icons-material/Alarm';
 import { DateTime } from 'luxon';
 import User from '../user/user';
 import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Button, TextField } from '@mui/material';
+import { placeBet } from '../../services/event-services';
+import { NotificationManager } from 'react-notifications';
 
 export default function Event({events}){
 
@@ -32,8 +32,22 @@ export default function Event({events}){
         }
       }, [data])
 
-    const sendBet = () => {
-        console.log(score1, score2);
+    const sendBet = async () => {
+        const bet = await placeBet(authData.token, {score1, score2, 'event': event.id})
+        console.log(bet);
+        if(bet){
+            if(bet.new){
+                event.bets.push(bet.result)
+            }
+            else {
+                const myBetIndex = event.bets.findIndex(el => el.user.id === bet.results.user.id);
+                event.bets[myBetIndex] = bet.results;
+                
+            }
+            NotificationManager.success(bet.message)
+            setScore1('');
+            setScore2('');
+        }
     }
 
     if (error) return <h1>Error</h1>
@@ -68,6 +82,8 @@ export default function Event({events}){
                                             </TableRow>
                                         </Table>
                                     </TableContainer>
+                                </div>
+                            })}
                                 <br/>
                                 <TextField label="Score 1" type="number" 
                                     onChange={ e => setScore1(e.target.value)}
@@ -78,9 +94,6 @@ export default function Event({events}){
                                 />
                                 <br/>
                                 <Button variant="contained" color="primary" onClick={() => sendBet() } disabled={!score1 || !score2} >Place Bet</Button>
-                            </div>
-                            
-                    }) }
                 </div>
             }
 
