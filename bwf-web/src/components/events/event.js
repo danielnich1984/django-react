@@ -37,7 +37,7 @@ export default function Event({events}){
         console.log(bet);
         if(bet){
             if(bet.new){
-                event.bets.push(bet.result)
+                event.bets.push(bet.results)
             }
             else {
                 const myBetIndex = event.bets.findIndex(el => el.user.id === bet.results.user.id);
@@ -58,9 +58,10 @@ export default function Event({events}){
         
        
         <React.Fragment>
-            <div><Link to={'/'}>Back</Link></div>
+            
             { event && evtTime &&
                 <div>
+                    <Link to={`/details/${event.group}`}>Back</Link>
                     <h3>{event.team1} VS {event.team2}</h3>
                     { event.score1 >= 0 && event.score2 >= 0 && 
                         <h2>{event.score1} : {event.score2}</h2>

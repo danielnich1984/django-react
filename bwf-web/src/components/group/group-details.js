@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import { Button, ListItem } from '@mui/material';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import { useFetchGroup } from '../../hooks/fetch-group';
 import User from '../user/user';
 import { joinGroup, leaveGroup } from '../../services/group-services';
@@ -16,7 +16,7 @@ function GroupDetails() {
   const [ group, setGroup ] = useState(null);
   const [ isGroup, setInGroup ] = useState(false);
   const [ isAdmin, setIsAdmin ] = useState(false);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -41,6 +41,11 @@ function GroupDetails() {
     )
   }
 
+  const addEvent = () => {
+    navigate('/event-form/', {state: {group: group}})
+  }
+
+
   if (error) return <h1>Error</h1>
   if (loading) return <h1> Loading...</h1>
 
@@ -58,6 +63,9 @@ function GroupDetails() {
                 :
                   <Button onClick={()=> joinHere()} variant="contained" color="primary">Join Group</Button>
                 }
+                {isAdmin &&
+                  <Button onClick={()=> addEvent()} variant="contained" color="primary">Add New Event</Button>
+                } 
 
                 
                 <EventList events={group.events} />
