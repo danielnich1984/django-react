@@ -10,6 +10,7 @@ from .models import Group, Event, UserProfile, Member, Comment, Bet
 from .serializers import BetSerializer, GroupSerializer, GroupFullSerializer, EventSerializer, UserSerializer, UserProfileSerializer, ChangePasswordSerializer, MemberSerializer, CommentSerializer, EventFullSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+import pytz
 
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
@@ -131,8 +132,7 @@ class BetViewset(viewsets.ModelViewSet):
             in_group = self.checkifUserInGroup(event, request.user)
 
 
-            # if event.time > datetime.now() and in_group:
-            if in_group:
+            if event.time > datetime.now(pytz.UTC) and in_group:
 
                 score1 = request.data['score1']
                 score2 = request.data['score2']
