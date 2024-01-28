@@ -11,7 +11,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { Button, TextField } from '@mui/material';
-import { placeBet } from '../../services/event-services';
+import { placeBet, setResults } from '../../services/event-services';
 import { NotificationManager } from 'react-notifications';
 
 export default function Event({events}){
@@ -21,6 +21,8 @@ export default function Event({events}){
     const [ data, loading, error ] = useFetchEvent(authData.token, id);
     const [ event, setEvent ] = useState(null);
     const [ evtTime, setEvtTime ] = useState(null);
+    const [ isFuture, setisFuture ] = useState(null);
+    const [ timeDiff, setTimeDiff] = useState(null);
     const [ score1, setScore1 ] = useState(null);
     const [ score2, setScore2 ] = useState(null);
 
@@ -28,7 +30,11 @@ export default function Event({events}){
         setEvent(data);
         if(data?.time) {
             const format = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-            setEvtTime(DateTime.fromFormat(data.time, format))
+            const eventTime = DateTime.fromFormat(data.time, format)
+            setEvtTime(eventTime);
+            const now = DateTime.now();
+            setisFuture(eventTime > now);
+            setTimeDiff(eventTime.toRelative());
         }
       }, [data])
 
@@ -48,6 +54,19 @@ export default function Event({events}){
             setScore1('');
             setScore2('');
         }
+    }
+
+    const setScore = async() => {
+        const eventData = await setResults(authData.token, {score1, score2, 'event': event.id})
+        if(eventData){
+            setEvent(eventData);
+            NotificationManager.success("Score has been set")
+            setScore1('');
+            setScore2('');
+        } else {
+            NotificationManager.error("Score could not be set")
+        }
+
     }
 
     if (error) return <h1>Error</h1>
@@ -70,6 +89,8 @@ export default function Event({events}){
                         <CalendarTodayIcon color="primary" />{ evtTime.toSQLDate() } 
                         <AlarmIcon color="primary" />{ evtTime.toFormat('HH:mm') }
                     </h2>
+                    <h2>{timeDiff}</h2>
+                    <h3>Number of people already bet: {event.num_bets}</h3>
                     <hr/>
                     <br/>
                     { event.bets && event.bets.map(bet => {
@@ -79,22 +100,43 @@ export default function Event({events}){
                                             <TableRow>
                                                 <TableCell><User user={bet.user} /></TableCell>
                                                 <TableCell><h4>{bet.score1} : {bet.score2} </h4></TableCell>
-                                                <TableCell><h4>PTS</h4></TableCell>  
+                                                <TableCell><h4>{bet.points} PTS</h4></TableCell>  
                                             </TableRow>
                                         </Table>
                                     </TableContainer>
                                 </div>
                             })}
                                 <br/>
-                                <TextField label="Score 1" type="number" 
-                                    onChange={ e => setScore1(e.target.value)}
-                                />
-                                    :
-                                <TextField label="Score 2" type="number" 
-                                    onChange={ e => setScore2(e.target.value)}
-                                />
                                 <br/>
-                                <Button variant="contained" color="primary" onClick={() => sendBet() } disabled={!score1 || !score2} >Place Bet</Button>
+
+                                { isFuture ?
+                                    <div>
+                                        <TextField label="Score 1" type="number" 
+                                            onChange={ e => setScore1(e.target.value)}
+                                        />
+                                            :
+                                        <TextField label="Score 2" type="number" 
+                                            onChange={ e => setScore2(e.target.value)}
+                                        />
+                                        <br/>
+                                    
+                                        <Button variant="contained" color="primary" onClick={() => sendBet() } disabled={!score1 || !score2} >Place Bet</Button>
+                                    </div>
+                                : event.is_admin ?
+                                    <div>
+                                        <TextField label="Score 1" type="number" 
+                                        onChange={ e => setScore1(e.target.value)}
+                                        />
+                                        :
+                                        <TextField label="Score 2" type="number" 
+                                        onChange={ e => setScore2(e.target.value)}
+                                        />
+                                        <br/>
+                                        <Button variant="contained" color="primary" onClick={() => setScore() } disabled={!score1 || !score2} >Set Score</Button> 
+                                    </div> 
+                                : null
+                                    
+                                }
                 </div>
             }
 

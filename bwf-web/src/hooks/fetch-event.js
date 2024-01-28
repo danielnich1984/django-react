@@ -17,7 +17,7 @@ export function useFetchEvent(token, eventId){
             setError(null);
         }
         getData();
-    }, [eventId])
+    }, [token, eventId])
 
     return [event, loading, error]
 }

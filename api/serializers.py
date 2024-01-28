@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from .models import Group, Event, UserProfile, Member, Comment, Bet
+from django.db.models import Sum
+from django.utils import timezone
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,15 +34,38 @@ class BetSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False)
     class Meta: 
         model = Bet
-        fields = ('id', 'user', 'events', 'score1', 'score2')
+        fields = ('id', 'user', 'events', 'score1', 'score2', 'points')
 
 class EventFullSerializer(serializers.ModelSerializer):
-    bets = BetSerializer(many=True)
+    bets = serializers.SerializerMethodField()
+    is_admin = serializers.SerializerMethodField()
+    num_bets = serializers.SerializerMethodField()
+
 
     class Meta: 
         model = Event
-        fields = ('id', 'team1', 'team2', 'time', 'score1', 'score2', 'group', 'bets')
+        fields = ('id', 'team1', 'team2', 'time', 'score1', 'score2', 'group', 'bets', 'is_admin', 'num_bets')
 
+    def get_num_bets(self, obj):
+        no_bets = Bet.objects.filter(events=obj).count()
+        return no_bets
+    
+    def get_bets(self, obj):
+        if obj.time < timezone.now():
+            bets = Bet.objects.filter(events=obj)
+        else:
+            user = self.context['request'].user
+            bets = Bet.objects.filter(events=obj, user=user)
+        serializer = BetSerializer(bets, many=True)
+        return serializer.data
+
+    def get_is_admin(self, obj):
+        try: 
+            user = self.context['request'].user
+            member = Member.objects.get(group=obj.group, user=user)
+            return member.admin
+        except:
+            return None
 
 class MemberSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False)
@@ -79,10 +104,10 @@ class GroupFullSerializer(serializers.ModelSerializer):
         members = obj.members.all()
 
         for member in members:
-            points = 0
+            points = Bet.objects.filter(events__group=obj, user=member.user.id).aggregate(pts=Sum('points'))
             members_serialized = MemberSerializer(member, many=False)
             member_data = members_serialized.data
-            member_data['points'] = points
+            member_data['points'] = points['pts'] or 0
 
             people_points.append(member_data)
         

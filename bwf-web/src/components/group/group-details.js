@@ -1,12 +1,13 @@
 import React, {useState, useEffect } from 'react';
-import { Button, ListItem } from '@mui/material';
-import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useFetchGroup } from '../../hooks/fetch-group';
 import User from '../user/user';
 import { joinGroup, leaveGroup } from '../../services/group-services';
 import { useAuth } from '../../hooks/useAuth';
 import Comments from '../comments/comments';
 import EventList from '../events/events-list'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 function GroupDetails() {
 
@@ -21,13 +22,32 @@ function GroupDetails() {
   useEffect(() => {
 
     if(data?.members){
+
+      data.members.sort((a,b) => b.points - a.points)
+
+      const availableTrophies = ['Gold', 'Silver', 'Bronze'];
+      let currentTrophy = 0;
+      data.members.map( (m, indx)  => {
+        if(indx === 0){
+          m.trophy = availableTrophies[currentTrophy];
+        } else {
+          if(m.points != data.members[indx -1].points){
+            currentTrophy++;
+          }
+          if(currentTrophy < availableTrophies.length){
+            m.trophy = availableTrophies[currentTrophy];
+          }
+        }
+
+      })
+
       if(authData?.user){
         setInGroup(!!data.members.find( member => member.user.id === authData.user.id));
         setIsAdmin(!!data.members.find( member => member.user.id === authData.user.id)?.admin);
       }
     }
     setGroup(data);
-  }, [data])
+  }, [authData.user, data])
 
   const joinHere = () => {
     joinGroup({user: authData.user.id, group: group.id}).then(
@@ -51,9 +71,9 @@ function GroupDetails() {
 
     return (
         <div>
-            <Link to={'/'}>Back</Link>
             { group &&
               <React.Fragment>
+                <Link key={group.id} to={'/'}>Back</Link>
                 <h1>{group.name} {group.location}</h1>
                 <h2>{group.description}</h2>
 
@@ -77,6 +97,7 @@ function GroupDetails() {
                   
                   return <div key={member.id} className="memberContainer">
                     <User user={member.user} />
+                    <p><EmojiEventsIcon />{member.trophy}</p>
                     <p>{member.points}pts</p>
                   </div>
                 })}
